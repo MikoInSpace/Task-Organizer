@@ -1,4 +1,4 @@
-### Task Organizer
+# Task Organizer
 The Task Organizer is a simple command-line application that allows you to manage and organize your tasks. It provides functionalities to add, edit, delete, and view tasks. The tasks are stored in a text file for persistence between sessions.
 
 Features
