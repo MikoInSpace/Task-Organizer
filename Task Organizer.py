@@ -1,20 +1,24 @@
 import os
 
-# Function to get the user's documents path
 def get_documents_path():
     user_home = os.path.expanduser("~")
     documents_path = os.path.join(user_home, "Documents")
     return documents_path
 
-# Function to save tasks to a file
 def save_tasks_to_file(tasks):
     documents_path = get_documents_path()
     file_path = os.path.join(documents_path, "tasks.txt")
     with open(file_path, "w") as file:
+        file.write("+------------------------------------+------------------------------------+------------------------------------+\n")
+        file.write("|              Title                 |            Description              |                Time                |\n")
+        file.write("+------------------------------------+------------------------------------+------------------------------------+\n")
         for task in tasks:
-            file.write(f"Title: {task['title']}\nDescription: {task['description']}\nTime: {task['time']}\n\n")
+            title = task['title']
+            description = task['description']
+            time = task['time']
+            file.write(f"| {title.ljust(34)} | {description.ljust(34)} | {time.ljust(34)} |\n")
+            file.write("+------------------------------------+------------------------------------+------------------------------------+\n")
 
-# Function to load tasks from a file
 def load_tasks_from_file():
     tasks = []
     documents_path = get_documents_path()
@@ -24,26 +28,20 @@ def load_tasks_from_file():
             lines = file.readlines()
             title, description, time = "", "", ""
             for line in lines:
-                if line.startswith("Title: "):
-                    title = line.strip()[7:]
-                elif line.startswith("Description: "):
-                    description = line.strip()[13:]
-                elif line.startswith("Time: "):
-                    time = line.strip()[6:]
-                    if title and description and time:
-                        tasks.append({"title": title, "description": description, "time": time})
-                        title, description, time = "", "", ""
+                if line.startswith("| "):
+                    parts = line.split("|")[1:-1]
+                    title = parts[0].strip()
+                    description = parts[1].strip()
+                    time = parts[2].strip()
+                    tasks.append({"title": title, "description": description, "time": time})
     except FileNotFoundError:
         pass
     return tasks
 
-# Load tasks from the file
 tasks = load_tasks_from_file()
 
-# Print the welcome message
 print("Welcome to Task Organizer!")
 
-# Main loop
 while True:
     print("What would you like to do?")
     print("1. Add a task")
@@ -52,11 +50,9 @@ while True:
     print("4. View all tasks")
     print("5. Exit")
 
-    # Get user's selection
     selection = input("Select a task: ")
 
     if selection == "1":
-        # Add a new task
         title = input("Enter the task title: ")
         description = input("Enter the task description: ")
         time = input("Enter the task time: ")
@@ -66,7 +62,6 @@ while True:
         print("Task added successfully!")
 
     elif selection == "2":
-        # Delete a task
         if tasks:
             print("Select a task to delete:")
             for index, task in enumerate(tasks):
@@ -82,7 +77,6 @@ while True:
             print("No tasks to delete.")
 
     elif selection == "3":
-        # Edit a task
         if tasks:
             print("Select a task to edit:")
             for index, task in enumerate(tasks):
@@ -101,19 +95,20 @@ while True:
             print("No tasks to edit.")
 
     elif selection == "4":
-        # View all tasks
         if tasks:
             print("All tasks:")
-            for index, task in enumerate(tasks):
-                print(f"{index + 1}. Title: {task['title']}\nDescription: {task['description']}\nTime: {task['time']}\n")
+            print("+------------------------------------+------------------------------------+------------------------------------+")
+            print("|              Title                 |            Description             |                Time                |")
+            print("+------------------------------------+------------------------------------+------------------------------------+")
+            for task in tasks:
+                print(f"| {task['title'].ljust(34)} | {task['description'].ljust(34)} | {task['time'].ljust(34)} |")
+                print("+------------------------------------+------------------------------------+------------------------------------+")
         else:
             print("No tasks available.")
 
     elif selection == "5":
-        # Exit the program
         print("Exiting the Task Organizer.")
         break
 
     else:
-        # Invalid selection
         print("Invalid selection. Please choose a valid option.")
