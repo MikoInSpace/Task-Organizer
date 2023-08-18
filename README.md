@@ -18,6 +18,9 @@ The Task Organizer is a simple command-line application that allows you to manag
 
 **Exit**: To exit the program, select option 5 from the main menu.
 
+## Desktop Notifications
+If a task is due within 10 minutes the script will automatically send a desktop notification to the user stating that [TASK TITLE] is due within 10 minutes.
+
 ## Getting Started
 Clone this repository to your local machine using:
 
