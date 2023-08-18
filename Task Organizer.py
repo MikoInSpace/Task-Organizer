@@ -1,4 +1,8 @@
 import os
+import plyer
+import platform
+from plyer import notification
+from datetime import datetime
 
 def get_documents_path():
     user_home = os.path.expanduser("~")
@@ -9,15 +13,15 @@ def save_tasks_to_file(tasks):
     documents_path = get_documents_path()
     file_path = os.path.join(documents_path, "tasks.txt")
     with open(file_path, "w") as file:
-        file.write("+------------------------------------+------------------------------------+------------------------------------+\n")
-        file.write("|              Title                 |            Description              |                Time                |\n")
-        file.write("+------------------------------------+------------------------------------+------------------------------------+\n")
+        file.write("+------------------------------------+------------------------------------+-------------------+\n")
+        file.write("|              Title                 |            Description             |        Time       |\n")
+        file.write("+------------------------------------+------------------------------------+-------------------+\n")
         for task in tasks:
             title = task['title']
             description = task['description']
             time = task['time']
-            file.write(f"| {title.ljust(34)} | {description.ljust(34)} | {time.ljust(34)} |\n")
-            file.write("+------------------------------------+------------------------------------+------------------------------------+\n")
+            file.write(f"| {title.ljust(34)} | {description.ljust(34)} | {time.ljust(17)} |\n")
+            file.write("+------------------------------------+------------------------------------+-------------------+\n")
 
 def load_tasks_from_file():
     tasks = []
@@ -38,11 +42,19 @@ def load_tasks_from_file():
         pass
     return tasks
 
+def send_notification(title):
+    notification.notify(
+        title="Task Reminder",
+        message=f"It's time for: {title}",
+        timeout=10
+    )
+
 tasks = load_tasks_from_file()
 
 print("Welcome to Task Organizer!")
 
 while True:
+    
     print("What would you like to do?")
     print("1. Add a task")
     print("2. Delete a task")
@@ -53,14 +65,28 @@ while True:
     selection = input("Select a task: ")
 
     if selection == "1":
+
         title = input("Enter the task title: ")
         description = input("Enter the task description: ")
-        time = input("Enter the task time: ")
-        task = {"title": title, "description": description, "time": time}
+        
+        while True:
+            try:
+                time_input = input("Enter the task time (DD-MM-YYYY HH:MM): ")
+                time = datetime.strptime(time_input, "%d-%m-%Y %H:%M")
+                break
+            except ValueError:
+                print("Invalid date and time format. Please use DD-MM-YYYY HH:MM format.")
+        
+        task = {"title": title, "description": description, "time": time.strftime("%d-%m-%Y %H:%M")}
         tasks.append(task)
         save_tasks_to_file(tasks)
         print("Task added successfully!")
 
+        # Check if the task time is within the next 10 minutes and send a notification
+        current_time = datetime.now()
+        if (time - current_time).total_seconds() <= 600:
+            send_notification(title)
+  
     elif selection == "2":
         if tasks:
             print("Select a task to delete:")
