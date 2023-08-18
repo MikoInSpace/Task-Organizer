@@ -21,7 +21,7 @@ The Task Organizer is a simple command-line application that allows you to manag
 ## Desktop Notifications
 If a task is due within 10 minutes the script will automatically send a desktop notification to the user stating that [TASK TITLE] is due within 10 minutes.
 
-# __STATUS: Borken__
+### __STATUS: Borken__
 
 ## Getting Started
 Clone this repository to your local machine using:
