@@ -1,8 +1,8 @@
 import os
-import plyer
-import platform
-from plyer import notification
 from datetime import datetime
+import schedule
+import time
+from plyer import notification
 
 def get_documents_path():
     user_home = os.path.expanduser("~")
@@ -42,19 +42,35 @@ def load_tasks_from_file():
         pass
     return tasks
 
-def send_notification(title):
-    notification.notify(
-        title="Task Reminder",
-        message=f"It's time for: {title}",
-        timeout=10
-    )
-
 tasks = load_tasks_from_file()
 
 print("Welcome to Task Organizer!")
 
+# Function to send desktop notification
+def send_notification(task):
+    notification_title = "Task Due Soon"
+    notification_message = f"The task '{task['title']}' is due in 5 minutes or less."
+    notification.notify(
+        title=notification_title,
+        message=notification_message,
+        timeout=10  # Notification timeout in seconds
+    )
+
+# Function to check for due tasks and send notifications
+def check_due_tasks():
+    now = datetime.now()
+    for task in tasks:
+        task_time = datetime.strptime(task['time'], "%d-%m-%Y %H:%M")
+        time_difference = task_time - now
+        print(f"Task: {task['title']} | Time difference: {time_difference.total_seconds()} seconds")
+        if 0 <= time_difference.total_seconds() <= 300:  # 5 minutes (300 seconds)
+            send_notification(task)
+
+
+# Schedule the task checker to run every minute
+schedule.every(1).minutes.do(check_due_tasks)
+
 while True:
-    
     print("What would you like to do?")
     print("1. Add a task")
     print("2. Delete a task")
@@ -65,10 +81,8 @@ while True:
     selection = input("Select a task: ")
 
     if selection == "1":
-
         title = input("Enter the task title: ")
         description = input("Enter the task description: ")
-        
         while True:
             try:
                 time_input = input("Enter the task time (DD-MM-YYYY HH:MM): ")
@@ -76,17 +90,11 @@ while True:
                 break
             except ValueError:
                 print("Invalid date and time format. Please use DD-MM-YYYY HH:MM format.")
-        
         task = {"title": title, "description": description, "time": time.strftime("%d-%m-%Y %H:%M")}
         tasks.append(task)
         save_tasks_to_file(tasks)
         print("Task added successfully!")
-
-        # Check if the task time is within the next 10 minutes and send a notification
-        current_time = datetime.now()
-        if (time - current_time).total_seconds() <= 600:
-            send_notification(title)
-  
+          
     elif selection == "2":
         if tasks:
             print("Select a task to delete:")
@@ -132,9 +140,15 @@ while True:
         else:
             print("No tasks available.")
 
+
     elif selection == "5":
         print("Exiting the Task Organizer.")
         break
 
     else:
         print("Invalid selection. Please choose a valid option.")
+
+    # Run pending scheduled tasks
+    schedule.run_pending()
+
+
