@@ -66,11 +66,11 @@ def check_due_tasks():
         if 0 <= time_difference.total_seconds() <= 300:  # 5 minutes (300 seconds)
             send_notification(task)
 
-
 # Schedule the task checker to run every minute
 schedule.every(1).minutes.do(check_due_tasks)
 
 while True:
+    os.system('cls' if os.name == 'nt' else 'clear')
     print("What would you like to do?")
     print("1. Add a task")
     print("2. Delete a task")
@@ -81,6 +81,7 @@ while True:
     selection = input("Select a task: ")
 
     if selection == "1":
+        os.system('cls' if os.name == 'nt' else 'clear')
         title = input("Enter the task title: ")
         description = input("Enter the task description: ")
         while True:
@@ -94,41 +95,54 @@ while True:
         tasks.append(task)
         save_tasks_to_file(tasks)
         print("Task added successfully!")
-          
+
     elif selection == "2":
+        os.system('cls' if os.name == 'nt' else 'clear')
         if tasks:
             print("Select a task to delete:")
             for index, task in enumerate(tasks):
                 print(f"{index + 1}. {task['title']}")
-            task_index = int(input()) - 1
-            if 0 <= task_index < len(tasks):
-                deleted_task = tasks.pop(task_index)
-                save_tasks_to_file(tasks)
-                print(f"Task '{deleted_task['title']}' deleted successfully!")
-            else:
-                print("Invalid task index.")
+            try:
+                task_index = int(input()) - 1
+                if 0 <= task_index < len(tasks):
+                    deleted_task = tasks.pop(task_index)
+                    save_tasks_to_file(tasks)
+                    print(f"Task '{deleted_task['title']}' deleted successfully!")
+                else:
+                    print("Invalid task index.")
+            except ValueError:
+                print("Invalid input. Please enter a valid task number.")
         else:
             print("No tasks to delete.")
 
     elif selection == "3":
+        os.system('cls' if os.name == 'nt' else 'clear')
         if tasks:
             print("Select a task to edit:")
             for index, task in enumerate(tasks):
                 print(f"{index + 1}. {task['title']}")
-            task_index = int(input()) - 1
-            if 0 <= task_index < len(tasks):
-                new_title = input("Enter the new task title: ")
-                new_description = input("Enter the new task description: ")
-                new_time = input("Enter the new task time: ")
-                tasks[task_index] = {"title": new_title, "description": new_description, "time": new_time}
-                save_tasks_to_file(tasks)
-                print("Task edited successfully!")
-            else:
-                print("Invalid task index.")
+            try:
+                task_index = int(input()) - 1
+                if 0 <= task_index < len(tasks):
+                    new_title = input("Enter the new task title: ")
+                    new_description = input("Enter the new task description: ")
+                    new_time = input("Enter the new task time (DD-MM-YYYY HH:MM): ")
+                    try:
+                        new_time = datetime.strptime(new_time, "%d-%m-%Y %H:%M")
+                        tasks[task_index] = {"title": new_title, "description": new_description, "time": new_time.strftime("%d-%m-%Y %H:%M")}
+                        save_tasks_to_file(tasks)
+                        print("Task edited successfully!")
+                    except ValueError:
+                        print("Invalid date and time format. Please use DD-MM-YYYY HH:MM format.")
+                else:
+                    print("Invalid task index.")
+            except ValueError:
+                print("Invalid input. Please enter a valid task number.")
         else:
             print("No tasks to edit.")
 
     elif selection == "4":
+        os.system('cls' if os.name == 'nt' else 'clear')
         if tasks:
             print("All tasks:")
             print("+------------------------------------+------------------------------------+------------------------------------+")
@@ -137,11 +151,12 @@ while True:
             for task in tasks:
                 print(f"| {task['title'].ljust(34)} | {task['description'].ljust(34)} | {task['time'].ljust(34)} |")
                 print("+------------------------------------+------------------------------------+------------------------------------+")
+                time.sleep(5)
         else:
             print("No tasks available.")
 
-
     elif selection == "5":
+        os.system('cls' if os.name == 'nt' else 'clear')
         print("Exiting the Task Organizer.")
         break
 
@@ -150,5 +165,3 @@ while True:
 
     # Run pending scheduled tasks
     schedule.run_pending()
-
-
