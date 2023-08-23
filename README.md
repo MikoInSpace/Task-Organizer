@@ -36,6 +36,11 @@ __python task_organizer.py__
 
 ## Requirements
 Python 3.x
+schedule
+os
+datetime
+time
+plyer
 
 ### Note
 Tasks are stored in a text file named tasks.txt located in your user's Documents folder. Make sure you have appropriate read and write permissions for the Documents folder.
